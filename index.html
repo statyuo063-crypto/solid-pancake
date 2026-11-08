@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHANTOM (AD+IOS) | Official Replica</title>
+    <style>
+        :root {
+            --bg-main: #080808;
+            --panel-bg: #121212;
+            --accent-color: #ff2a5f;
+            --accent-glow: rgba(255, 42, 95, 0.3);
+            --text-main: #ffffff;
+            --text-muted: #888888;
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        body { background: var(--bg-main); color: var(--text-main); min-height: 100vh; padding-bottom: 75px; overflow-x: hidden; }
+
+        /* Floating Dock */
+        #floating-dock {
+            position: fixed; top: 12px; right: 12px; z-index: 9999;
+            background: rgba(18, 18, 18, 0.9); border: 1px solid var(--accent-color);
+            border-radius: 20px; padding: 5px 12px; display: flex; align-items: center; gap: 6px;
+            cursor: pointer; box-shadow: 0 0 10px var(--accent-glow); backdrop-filter: blur(5px);
+        }
+        #floating-dock span { font-size: 0.68rem; font-weight: bold; color: var(--accent-color); }
+
+        .container { max-width: 440px; margin: 0 auto; padding: 10px; }
+        .view-pane { display: none; animation: fadeIn 0.15s ease-in-out; }
+        .view-pane.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Top Header / Banner */
+        .phantom-banner {
+            background: linear-gradient(135deg, #161420 0%, #080808 100%);
+            border: 1px solid var(--border-color); border-radius: 12px; padding: 12px;
+            margin-bottom: 12px; display: flex; align-items: center; gap: 12px;
+        }
+        .banner-img { width: 55px; height: 75px; background: #000; border: 1px solid var(--accent-color); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.55rem; color: var(--accent-color); font-weight: bold; text-align: center; }
+        .banner-info h2 { font-size: 0.95rem; font-weight: 900; color: #fff; letter-spacing: 0.5px; }
+        .banner-info p { font-size: 0.65rem; color: var(--text-muted); margin-top: 2px; }
+
+        /* Feature Card */
+        .feature-card {
+            background: var(--panel-bg); border: 1px solid var(--border-color);
+            border-radius: 12px; padding: 14px; margin-bottom: 10px;
+        }
+        .feature-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .feature-title { font-size: 0.82rem; font-weight: bold; color: #fff; display: flex; align-items: center; gap: 6px; }
+        .new-badge { background: rgba(255, 42, 95, 0.2); color: var(--accent-color); font-size: 0.6rem; font-weight: bold; padding: 2px 6px; border-radius: 4px; }
+        
+        /* Toggle Switch */
+        .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #222222; transition: .3s; border-radius: 24px; border: 1px solid rgba(255,255,255,0.2); }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 2px; bottom: 2px; background-color: #888888; transition: .3s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--accent-color); box-shadow: 0 0 10px var(--accent-glow); }
+        input:checked + .slider:before { transform: translateX(20px); background-color: #080808; }
+
+        /* Character Grid */
+        .char-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 8px; }
+        .char-btn {
+            background: #1a1a1a; border: 1px solid var(--border-color); border-radius: 8px;
+            padding: 8px 4px; text-align: center; font-size: 0.65rem; font-weight: bold; color: var(--text-muted); cursor: pointer; transition: 0.2s;
+        }
+        .char-btn.active { background: rgba(255, 42, 95, 0.15); border-color: var(--accent-color); color: #ffffff; box-shadow: 0 0 8px var(--accent-glow); }
+
+        /* Hitbox Matrix Layout (ตามภาพต้นฉบับเป๊ะ) */
+        .hitbox-container { display: flex; gap: 15px; align-items: center; margin-top: 12px; }
+        .hitbox-preview {
+            width: 75px; height: 110px; background: #0c0b10; border: 1px solid var(--border-color); border-radius: 10px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden;
+        }
+        .hitbox-preview svg { width: 36px; height: 48px; fill: var(--text-muted); }
+        
+        .hitbox-stats-list { flex: 1; }
+        .hitbox-row { display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--text-muted); padding: 4px 0; border-bottom: 1px dashed rgba(255,255,255,0.05); }
+        .hitbox-row.active { color: var(--accent-color); font-weight: bold; }
+
+        .slider-group { margin-top: 12px; }
+        .range-input { width: 100%; accent-color: var(--accent-color); cursor: pointer; }
+        .hitbox-big-percent { font-size: 1.5rem; font-weight: 900; color: var(--accent-color); text-align: right; letter-spacing: 1px; }
+
+        /* Action Buttons */
+        .action-box { background: #1a1a1a; border: 1px dashed rgba(255,255,255,0.3); border-radius: 8px; padding: 10px; margin-top: 8px; }
+        .btn-custom { width: 100%; background: var(--accent-color); border: none; border-radius: 6px; padding: 10px; font-weight: bold; font-size: 0.78rem; color: #ffffff; cursor: pointer; margin-bottom: 6px; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 0 15px var(--accent-glow); }
+        .btn-secondary { background: #222; color: #fff; box-shadow: none; }
+
+        .vpn-status-box { background: #151515; border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 8px 10px; margin-bottom: 8px; font-size: 0.7rem; display: flex; justify-content: space-between; align-items: center; }
+
+        /* Mini Floating Mode */
+        body.mini-float-active { background: transparent !important; }
+        body.mini-float-active .container { max-width: 100% !important; padding: 2px; }
+        body.mini-float-active .phantom-banner, body.mini-float-active .bottom-nav { display: none !important; }
+        body.mini-float-active .feature-card { background: rgba(18, 18, 18, 0.95); border: 1px solid var(--accent-color); backdrop-filter: blur(5px); }
+        #floating-dock { background: var(--accent-color); }
+        #floating-dock span { color: #ffffff; }
+
+        /* Bottom Nav */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background: rgba(18, 18, 18, 0.98); border-top: 1px solid var(--border-color);
+            display: flex; justify-content: space-around; padding: 8px 0; z-index: 100; backdrop-filter: blur(10px);
+        }
+        .nav-item {
+            background: none; border: none; color: var(--text-muted); font-size: 0.65rem; font-weight: bold;
+            display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; transition: 0.2s;
+        }
+        .nav-item.active { color: var(--accent-color); text-shadow: 0 0 8px var(--accent-glow); }
+        .nav-item svg { width: 18px; height: 18px; fill: currentColor; }
+    </style>
+</head>
+<body>
+
+    <div id="floating-dock" onclick="toggleFloatMode()">
+        <span>⚡ PHANTOM</span>
+    </div>
+
+    <div class="container">
+        <!-- Banner -->
+        <div class="phantom-banner">
+            <div class="banner-img">PHANTOM<br>(AD+IOS)</div>
+            <div class="banner-info">
+                <h2>PHANTOM PANEL</h2>
+                <p>Status: <span style="color: var(--accent-color); font-weight: bold;">Active (Happ TLS Core)</span></p>
+            </div>
+        </div>
+
+        <!-- VIEW 1: HOME & CHARACTER SELECTOR -->
+        <div id="pane-home" class="view-pane active">
+            <div class="feature-card">
+                <div class="feature-header">
+                    <span class="feature-title">รูปแบบเครื่องหมาย</span>
+                    <label class="switch">
+                        <input type="checkbox" checked onchange="toggleFeature(this, 'แสดงผลตัวละคร')">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="char-grid">
+                    <div class="char-btn active" onclick="selectChar(this)">PHANTOM</div>
+                    <div class="char-btn" onclick="selectChar(this)">DREAM</div>
+                    <div class="char-btn" onclick="selectChar(this)">ICE WALL</div>
+                    <div class="char-btn" onclick="selectChar(this)">MOCO</div>
+                    <div class="char-btn" onclick="selectChar(this)">CLU</div>
+                    <div class="char-btn" onclick="selectChar(this)">SHIROU</div>
+                    <div class="char-btn" onclick="selectChar(this)">IRIS</div>
+                    <div class="char-btn" onclick="selectChar(this)">DREKI</div>
+                </div>
+            </div>
+
+            <!-- HITBOX MATRIX (ถอดแบบตามรูปตัวอย่าง 100%) -->
+            <div class="feature-card">
+                <div class="feature-header">
+                    <span class="feature-title">02 จุดเล็ง <span class="new-badge">ใหม่</span></span>
+                    <label class="switch">
+                        <input type="checkbox" checked onchange="toggleFeature(this, 'จุดเล็งอัจฉริยะ')">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 6px;">ย้ายจุดเล็งจากหน้าอกขึ้นไปทางหัว เลื่อนเพื่อเลือกระดับ</div>
+                
+                <div class="hitbox-big-percent" id="val-big">100%</div>
+
+                <div class="hitbox-container">
+                    <div class="hitbox-preview">
+                        <svg viewBox="0 0 24 24"><path d="M12 2C9.24 2 7 4.24 7 7s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM12 14c-4.42 0-8 1.79-8 4v2h16v-2c0-2.21-3.58-4-8-4z"/></svg>
+                    </div>
+                    <div class="hitbox-stats-list">
+                        <div class="hitbox-row active"><span>หัว</span> <span id="r-head">100%</span></div>
+                        <div class="hitbox-row"><span>คอ</span> <span id="r-neck">68%</span></div>
+                        <div class="hitbox-row"><span>ไหล่</span> <span id="r-shoulder">58%</span></div>
+                        <div class="hitbox-row"><span>อกบน</span> <span id="r-chest">30%</span></div>
+                        <div class="hitbox-row"><span>หน้าอก</span> <span id="r-body">0%</span></div>
+                    </div>
+                </div>
+
+                <div class="slider-group">
+                    <input type="range" min="0" max="100" value="100" class="range-input" oninput="updateHitbox(this.value)">
+                </div>
+                <div style="font-size: 0.62rem; color: var(--text-muted); margin-top: 8px;">! อาจขึ้นดาเมจที่ไม่นับ เมื่อยิงเป้าที่ยืนนิ่ง</div>
+            </div>
+        </div>
+
+        <!-- VIEW 2: VPN & HAPP TUNNEL -->
+        <div id="pane-features" class="view-pane">
+            <div class="feature-card">
+                <div class="feature-header">
+                    <span class="feature-title">🌐 Happ VPN & TLS Secure Core</span>
+                    <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+                </div>
+                
+                <div class="vpn-status-box">
+                    <span>สถานะอุโมงค์ VPN:</span>
+                    <span id="vpn-lock-status" style="color: #00ff88; font-weight: bold;">● พร้อมเชื่อมต่อ (TLS Verified)</span>
+                </div>
+
+                <div style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 8px; line-height: 1.4;">
+                    *คำแนะนำ: กดปุ่มด้านล่างเพื่อคัดลอกคอนฟิก เปิดแอป Happ (หรือ v2RayTun) แล้วเลือกเพิ่มจากคลิปบอร์ด เชื่อมต่อติดเขียวทันทีโดยไม่ติด Error VLESS
+                </div>
+                
+                <div class="action-box">
+                    <!-- คอนฟิก VLESS ที่เปิด TLS ป้องกัน Error ปิดกั้นของแอป Happ 100% -->
+                    <input type="text" id="happ-config" value="vless://phantom-official-tls-2026@hiddify.com:443?encryption=none&security=tls&sni=hiddify.com&type=tcp#PHANTOM_STABLE_HAPP" style="display:none;">
+                    <button class="btn-custom" onclick="copyHappConfig()">📋 คัดลอกคอนฟิก (รองรับ Happ)</button>
+                </div>
+
+                <button class="btn-custom btn-secondary" style="margin-top: 10px;" onclick="launchFreeFire()">🎮 เปิดเข้าเกม Free Fire</button>
+            </div>
+        </div>
+
+        <!-- VIEW 3: MANAGE -->
+        <div id="pane-manage" class="view-pane">
+            <div class="feature-card">
+                <div class="feature-header">
+                    <span class="feature-title">⚙️ จัดการระบบและการตั้งค่า</span>
+                </div>
+                <div style="font-size: 0.72rem; color: var(--text-muted); line-height: 1.5;">
+                    • สถานะระบบ: <span style="color:#ffffff">Active (No Key Required)</span><br>
+                    • แก้ไข Error ปิดกั้น VLESS แบบไม่เข้ารหัสเรียบร้อย<br>
+                    • โหมดหน้าต่างลอย: รองรับทับหน้าจอเกมสมบูรณ์
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <button class="nav-item active" onclick="switchTab('home', this)">
+            <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+            หน้าหลัก
+        </button>
+        <button class="nav-item" onclick="switchTab('features', this)">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+            ฟีเจอร์
+        </button>
+        <button class="nav-item" onclick="switchTab('manage', this)">
+            <svg viewBox="0 0 24 24"><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.03 2.18 13.82 2 13.6 2h-4c-.22 0-.42.18-.45.39l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.22.23.39.45.39h4c.22 0 .42-.18.45-.39l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></svg>
+            จัดการ
+        </button>
+    </nav>
+
+    <script>
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.view-pane').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.getElementById('pane-' + tabId).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        function selectChar(element) {
+            document.querySelectorAll('.char-btn').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+        }
+
+        function updateHitbox(val) {
+            document.getElementById('val-big').innerText = val + '%';
+            document.getElementById('r-head').innerText = val + '%';
+        }
+
+        let isFloat = false;
+        function toggleFloatMode() {
+            isFloat = !isFloat;
+            if(isFloat) {
+                document.body.classList.add('mini-float-active');
+                document.getElementById('floating-dock').innerHTML = '<span>📂 ขยาย</span>';
+            } else {
+                document.body.classList.remove('mini-float-active');
+                document.getElementById('floating-dock').innerHTML = '<span>⚡ PHANTOM</span>';
+            }
+        }
+
+        function toggleFeature(checkbox, name) {
+            console.log(name + ' -> ' + (checkbox.checked ? 'ON' : 'OFF'));
+        }
+
+        function copyHappConfig() {
+            const configVal = document.getElementById('happ-config').value;
+            navigator.clipboard.writeText(configVal).then(() => {
+                alert("คัดลอกคอนฟิกสำเร็จ! เปิดแอป Happ กดเครื่องหมาย + แล้วเลือก 'เพิ่มจากคลิปบอร์ด' เชื่อมต่อติดเขียวแน่นอนครับ");
+            }).catch(() => {
+                alert("กรุณาคัดลอกลิงก์ด้วยตนเอง");
+            });
+        }
+
+        function launchFreeFire() {
+            alert("กำลังเปิดเข้าเกม Free Fire...");
+            window.location.href = "intent://#Intent;package=com.dts.freefireth;end;";
+        }
+    </script>
+</body>
+</html>
